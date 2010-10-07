@@ -83,6 +83,13 @@ class Application_Model_Twitter
         return $response;
     }
     
+    
+    public function getMessages()
+    {
+         $response = $this->getService()->directMessage->messages();
+         return $response;
+    }
+    
     /**
      * Connect to Twitter
      * @return Zend_Service_Twitter

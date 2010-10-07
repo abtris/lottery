@@ -104,4 +104,27 @@ class IndexController extends Zend_Controller_Action
         
 //        $this->view->messages = $this->_helper->flashMessenger->getMessages();        
     }
+    
+    public function ticketAction()
+    {
+        $twitter = $this->_helper->twitter(); /* @var $twitter Application_Model_Twitter */
+        if ($twitter->isLoggedIn()) {
+            // 'since_id'=> id_last_message 
+            $response   = $twitter->getMessages();
+             // id   - message id
+             // sender_id
+             // text
+             // created_at
+             // sender_screen_name            
+//             Zend_Debug::dump ($response);
+            echo "<dl>";
+             foreach ($response->direct_message as $d) {
+                 echo "<dt>".$d->sender_screen_name."</dt>";
+                 echo "<dd>";
+                 echo $d->text;
+                 echo "</dd>";
+             }
+             echo "</dl>";
+        }
+    }
 }
