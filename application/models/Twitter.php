@@ -77,7 +77,7 @@ class Application_Model_Twitter
      * @param string $longitude
      * @return Zend_Rest_Client_Result
      */
-    public function send($message, $latitude, $longitude)
+    public function send($message, $latitude = null, $longitude = null)
     {
         $response = $this->getService()->status->updateWithPosition($message, $latitude, $longitude);
         return $response;
