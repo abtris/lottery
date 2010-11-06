@@ -28,7 +28,7 @@ class Application_Model_Lottery
 
         if (file_exists($this->path)) {
             $content = file_get_contents($this->path);
-            $this->registerTickets = unserialize($content);
+            $this->registerTickets = json_decode($content, true);
         }
     }
     /**
@@ -37,7 +37,7 @@ class Application_Model_Lottery
      */
     public function save()
     {
-        $content = serialize($this->registerTickets);
+        $content = json_encode($this->registerTickets);
         file_put_contents($this->path, $content);
     }
 
@@ -91,14 +91,16 @@ class Application_Model_Lottery
      */
     public function validateTicket($ticket)
     {
-        if (isset($this->registerTickets['messages'])) {
-            foreach ($this->registerTickets['messages']  as $m) {
-                if ($m['id']==$ticket['id']) {
-                    return false;
+        if (is_array($ticket)) {
+            if (isset($this->registerTickets['messages'])) {
+                foreach ($this->registerTickets['messages']  as $m) {
+                    if ($m['id']==$ticket['id']) {
+                        return false;
+                    }
                 }
             }
-        }
-        return true;
+            return true;
+        } 
     }
     /**
      * Parse
