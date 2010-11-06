@@ -54,9 +54,15 @@ class Application_Model_Lottery
             'text' => (string) $directMessage->text,
             'nick' => (string) $directMessage->sender_screen_name
         );
+//        var_dump($this->validateTicket($ticket));
         if ($this->validateTicket($ticket)) {
             $this->lastTicket = $ticket['id'];
-            $this->registerTickets[] = $ticket;
+            $this->registerTickets['messages'][] = $ticket;
+            try {
+                $this->parseMessage($ticket['text']);
+            } catch (Exception $e) {
+                echo $e->getMessage();   
+            }
             $this->save();
             return true;
         }
@@ -85,7 +91,34 @@ class Application_Model_Lottery
      */
     public function validateTicket($ticket)
     {
+        if (isset($this->registerTickets['messages'])) {
+            foreach ($this->registerTickets['messages']  as $m) {
+                if ($m['id']==$ticket['id']) {
+                    return false;
+                }
+            }
+        }
         return true;
+    }
+    /**
+     * Parse
+     * @param string $text
+     * @return void
+     */
+    private function parseMessage($text)
+    {
+        preg_match('/(\d+)/', $text, $matches);
+        // add check for existing
+        if (!in_array($this->registerTickets['tickets'], $matches[0])) {
+            $this->registerTickets['tickets'][] = $matches[0];
+            return true;
+        } else {
+            throw new Exception('Ticket '.$matches[0].' will be register early');
+            return false;
+        }
+         
+        
+        
     }
 
 }
