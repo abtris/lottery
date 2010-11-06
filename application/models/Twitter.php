@@ -84,9 +84,9 @@ class Application_Model_Twitter
     }
     
     
-    public function getMessages()
+    public function getMessages(array $options = null)
     {
-         $response = $this->getService()->directMessage->messages();
+         $response = $this->getService()->directMessage->messages($options);
          return $response;
     }
     

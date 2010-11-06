@@ -2,7 +2,18 @@
 
 class IndexController extends Zend_Controller_Action
 {
-    
+    /**
+     * @var Application_Model_Lottery
+     */
+    public $lottery;
+
+    public function init()
+    {
+        if (!isset($this->lottery)) {
+            $this->lottery = new Application_Model_Lottery();
+        }
+    }
+
     public function indexAction()
     {
         $this->view->headTitle('Send Tweet');
@@ -104,27 +115,45 @@ class IndexController extends Zend_Controller_Action
         
 //        $this->view->messages = $this->_helper->flashMessenger->getMessages();        
     }
-    
+    /**
+     * Zpracovava prihlasene tickety
+     * @return void
+     */
     public function ticketAction()
     {
-        $twitter = $this->_helper->twitter(); /* @var $twitter Application_Model_Twitter */
+        $twitter = $this->_helper->twitter(); /* @var $twitter Application_Model_Twitter */        
         if ($twitter->isLoggedIn()) {
-            // 'since_id'=> id_last_message 
-            $response   = $twitter->getMessages();
+            // 'since_id'=> id_last_message
+            if ($this->lottery->getLastTicketId()>0) {
+                $options = array('since_id'=> $this->lottery->getLastTicketId());
+            } else {
+                $options = array();
+            }
+            // get direct message from since
+            $response   = $twitter->getMessages($options);
              // id   - message id
              // sender_id
              // text
              // created_at
              // sender_screen_name            
-//             Zend_Debug::dump ($response);
             echo "<dl>";
              foreach ($response->direct_message as $d) {
                  echo "<dt>".$d->sender_screen_name."</dt>";
                  echo "<dd>";
-                 echo $d->text;
+                 echo $d->text."<br/>";
+                 $this->lottery->registerTicket($d);
                  echo "</dd>";
              }
              echo "</dl>";
         }
+        Zend_Debug::dump($this->lottery->getTickets());
+    }
+    /**
+     * Show tickets
+     * @return void
+     */
+    public function showAction()
+    {
+        $this->view->tickets = $this->lottery->getTickets();
     }
 }
